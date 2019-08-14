@@ -167,6 +167,45 @@ class mpu6050:
             z = z * self.GRAVITIY_MS2
             return {'x': x, 'y': y, 'z': z}
 
+
+    def get_accel_data_each(self, g = False):
+        """Gets and returns the X, Y and Z values from the accelerometer.
+
+        If g is True, it will return the data in g
+        If g is False, it will return the data in m/s^2
+        Returns each value.
+        """
+        x = self.read_i2c_word(self.ACCEL_XOUT0)
+        y = self.read_i2c_word(self.ACCEL_YOUT0)
+        z = self.read_i2c_word(self.ACCEL_ZOUT0)
+
+        accel_scale_modifier = None
+        accel_range = self.read_accel_range(True)
+
+        if accel_range == self.ACCEL_RANGE_2G:
+            accel_scale_modifier = self.ACCEL_SCALE_MODIFIER_2G
+        elif accel_range == self.ACCEL_RANGE_4G:
+            accel_scale_modifier = self.ACCEL_SCALE_MODIFIER_4G
+        elif accel_range == self.ACCEL_RANGE_8G:
+            accel_scale_modifier = self.ACCEL_SCALE_MODIFIER_8G
+        elif accel_range == self.ACCEL_RANGE_16G:
+            accel_scale_modifier = self.ACCEL_SCALE_MODIFIER_16G
+        else:
+            print("Unkown range - accel_scale_modifier set to self.ACCEL_SCALE_MODIFIER_2G")
+            accel_scale_modifier = self.ACCEL_SCALE_MODIFIER_2G
+
+        x = x / accel_scale_modifier
+        y = y / accel_scale_modifier
+        z = z / accel_scale_modifier
+
+        if g is True:
+            return x,y,z
+        elif g is False:
+            x = x * self.GRAVITIY_MS2
+            y = y * self.GRAVITIY_MS2
+            z = z * self.GRAVITIY_MS2
+            return x,y,z
+
     def set_gyro_range(self, gyro_range):
         """Sets the range of the gyroscope to range.
 
